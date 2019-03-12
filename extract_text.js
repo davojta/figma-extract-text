@@ -5,10 +5,6 @@ const request = require('request')
 
 
 
-// REPLACE ME: replace these values with a file you own and with your own developer token.
-const file_id = 'bN4CiGwZPlGVBu9SdT347ZkU';
-const personal_access_token = '8894-fdb41f9b-93a3-4ce6-83ef-b6eaeb56c26b';
-
 const api_endpoint = 'https://api.figma.com/v1';
 
 function getTextNodes(figFile) {
@@ -28,8 +24,17 @@ function keysToArray(objects) {
   return keysArray;
 }
 
-const extractText = () => {
+const extractText = (personal_access_token, file_id) => {
+  
+  console.log('file_id', file_id);
+  console.log('personal_access_token1', personal_access_token);
+
+  console.log('start remove file');
+  fs.removeSync('./public/figma_text_layers.xlsx');
+  console.log('end remove file');
+
   return new Promise((resolve, reject) => {
+    console.log('personal_access_token2', personal_access_token);
     request.get(`${api_endpoint}/files/${file_id}`, {
       headers: {
         "Content-Type": "application/json",
@@ -56,6 +61,13 @@ const extractText = () => {
       const buffer = xlsx.build([{ name: 'Common', data: xlsxData }]);
       fs.writeFileSync('./public/figma_text_layers.xlsx', buffer, 'binary');
       resolve();
+      
+      setTimeout(() => {
+        console.log('clean up the file');
+        fs.removeSync('./public/figma_text_layers.xlsx');
+      }, 20*1000);
+
+      
     });
   })
 }
@@ -66,11 +78,13 @@ module.exports = {
 
 
 
-function requestErrorHandler(error, response, body) {
+function requestErrorHandler(error, response, body, reject) {
   if (error) {
-    console.log(error);
-    console.log(body);
+    console.error(error);
+    console.error(body);
     reject(error);
+
+    // response.send();
     // process.exit(1)
   }
 }
