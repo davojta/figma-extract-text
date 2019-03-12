@@ -1,0 +1,24 @@
+{
+  "name": "figma-extract-text",
+  "version": "1.0.0",
+  "description": "A tool to extract text from Figma documents.",
+  "scripts": {
+    "extract_text": "node --experimental-modules extract_text.js",
+    "run": "node app.js"
+  },
+  "devDependencies": {
+  },
+  "dependencies": {
+    "commander": "2.13.0",
+    "cryptiles": ">=4.1.2",
+    "extend": ">=3.0.2",
+    "fs-extra": "^7.0.1",
+    "hoek": "5.0.3",
+    "just-extend": ">=4.0.0",
+    "node-xlsx": "^0.14.1",
+    "request": "^2.83.0",
+    "sshpk": ">=1.13.2",
+    "traverse": "^0.6.6",
+    "express": "^4.16.4"
+  }
+}
