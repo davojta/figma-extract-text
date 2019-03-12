@@ -4,7 +4,7 @@
   "description": "A tool to extract text from Figma documents.",
   "scripts": {
     "extract_text": "node --experimental-modules extract_text.js",
-    "run": "node app.js"
+    "start": "node app.js"
   },
   "devDependencies": {
   },
