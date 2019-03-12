@@ -28,32 +28,41 @@ function keysToArray(objects) {
   return keysArray;
 }
 
-request.get(`${api_endpoint}/files/${file_id}`, {
-  headers: {
-    "Content-Type": "application/json",
-    "x-figma-token": personal_access_token,
-  },
-}, function (error, response, body) {
-  
-  requestErrorHandler(error, response, body);
+const extractText = () => {
+  return new Promise((resolve, reject) => {
+    request.get(`${api_endpoint}/files/${file_id}`, {
+      headers: {
+        "Content-Type": "application/json",
+        "x-figma-token": personal_access_token,
+      },
+    }, function (error, response, body) {
+      
+      requestErrorHandler(error, response, body, reject);
+    
+      const parsedBody = JSON.parse(body);
+      fs.outputJsonSync('./parsedBody.json', parsedBody, {
+        spaces: '\t',
+      });
+    
+      const textNodes = getTextNodes(parsedBody);
+      // console.log('textNodes', textNodes);
+      fs.outputJsonSync('./text_nodes.json', textNodes, {
+        spaces: '\t',
+      });
+    
+      const xlsxData = keysToArray(textNodes);
+      console.log('xlsxData', xlsxData);
+    
+      const buffer = xlsx.build([{ name: 'Common', data: xlsxData }]);
+      fs.writeFileSync('./public/figma_text_layers.xlsx', buffer, 'binary');
+      resolve();
+    });
+  })
+}
 
-  const parsedBody = JSON.parse(body);
-  fs.outputJsonSync('./parsedBody.json', parsedBody, {
-    spaces: '\t',
-  });
-
-  const textNodes = getTextNodes(parsedBody);
-  // console.log('textNodes', textNodes);
-  fs.outputJsonSync('./text_nodes.json', textNodes, {
-    spaces: '\t',
-  });
-
-  const xlsxData = keysToArray(textNodes);
-  console.log('xlsxData', xlsxData);
-
-  const buffer = xlsx.build([{ name: 'Common', data: xlsxData }]);
-  fs.writeFileSync('./figma_text_layers.xlsx', buffer, 'binary');
-});
+module.exports = {
+  extractText,
+};
 
 
 
@@ -61,7 +70,8 @@ function requestErrorHandler(error, response, body) {
   if (error) {
     console.log(error);
     console.log(body);
-    process.exit(1)
+    reject(error);
+    // process.exit(1)
   }
 }
 
